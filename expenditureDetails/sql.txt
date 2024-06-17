@@ -1,0 +1,32 @@
+select * from lich_meituan;
+
+select * from lich_zfb;
+
+select SUM(交易金额) from  lich_zfb
+         where 交易收支 like "%支出%"
+        and 交易对方 not like "%转账%";
+select * from  lich_zfb
+         where 交易收支 like "%支出%"
+        and 交易对方 not like "%转账%";
+select * from  lich_zfb
+         where 交易收支 like "%支出%"
+        and 交易金额 > 300
+        order by 交易日期;
+
+select * from lich_zfb
+         where 交易收支 = "其他" and  交易对方 not like "%收益发放%"
+         order by 交易日期;
+
+
+select * from lich_sxnx
+         where 交易类型 like "%转账%"
+         and 交易金额 > 100
+         and 交易金额 < 10000
+         and 交易收支 = "支出"
+         and 交易日期 between '2020-10-01' and '2021-06-30'
+         order by 交易日期;
+
+select * from lich_sxnx
+    where 交易金额 = 888;
+-- 生日转账 7号转账 未收8号退款
+
