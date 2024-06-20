@@ -24,7 +24,8 @@ lv_dingqi = 0.025
 lv_daikuan_gjj = 0.0285
 lv_daikuan_zgd = 0.036
 lv_daikuan_sd = 0.4
-
+zc = 30000
+gz = 4500
 
 # 房价，房屋面积，定期存款，活期存款，贷款，收入，支出，描述
 class Zichan:
@@ -46,7 +47,9 @@ class Zichan:
         print(f'{self.miaoshu}'
               f'当前持有资产： 房产价值：{fc} '
               f'  活期存款：{int(self.huoqi)}   定期存款(价值)：{int(self.dingqi)}   负债：{int(self.daikuan + self.daikuan_0)}'
-              f'  总资产 ：{int(zzc)},其中房产占比{int(fc / zzc * 100)}%  如果房价跌30%，资产为{int(self.fangjia * self.fang_mianji * 0.7 + self.huoqi + self.dingqi - self.daikuan - self.daikuan_0)}')
+              f'  总资产 ：{int(zzc)} '
+              #f',其中房产占比{int(fc / zzc * 100)}% 如果房价跌30%，资产为{int(self.fangjia * self.fang_mianji * 0.7 + self.huoqi + self.dingqi - self.daikuan - self.daikuan_0)}'
+              f'')
 
 
 # 每月月供额=〔贷款本金×月利率×(1+月利率)^还款月数〕÷〔(1+月利率)^还款月数-1〕
@@ -81,27 +84,31 @@ def fd_benjin_nian(dkbj, yg):
 
 # 按年计算
 def paopi(zichan, yg):
+    #初始化支出，防止跑批累计
+    zichan.zhichu = zc
     # 有月供的话，加入支出
     if zichan.daikuan > 0:
         zichan.zhichu = zichan.zhichu + yg * 12
-        #print(f'支出增加 月供*12 ：{yg * 12}' )
+        print(f'支出增加 月供*12 ：{yg * 12}' )
     # 有其他贷款的话，利息加入支出
     if zichan.daikuan_0 > 0:
         zichan.zhichu = zichan.zhichu + zichan.daikuan_0 * lv_daikuan_zgd
-        #print(f'支出增加 其他贷款利息 ： {zichan.daikuan_0 * lv_daikuan_zgd}')
+        print(f'支出增加 其他贷款利息 ： {zichan.daikuan_0 * lv_daikuan_zgd}')
     # 年结余
     jieyu = zichan.shouru - zichan.zhichu
-    #print(f'结余为：收入{zichan.shouru} - 支出{zichan.zhichu} :{jieyu}')
+    print(f'结余为：收入{zichan.shouru} - 支出{zichan.zhichu} :{jieyu}')
     # 活期跑批
     zichan.huoqi = (zichan.huoqi + jieyu) * (1 + lv_huoqi)
+    print(zichan.huoqi)
     if zichan.huoqi > 40000:
         zichan.dingqi = zichan.dingqi + 30000
         zichan.huoqi = zichan.huoqi - 30000
-        #print("活期存款较多，活期转定期3w")
+        print("活期存款较多，活期转定期3w")
     if zichan.huoqi < 0:
         zichan.dingqi = zichan.dingqi - 20000
         zichan.huoqi = zichan.huoqi + 20000
-        #print("活期钱不够了，定期转活期2w，若定期余额不足则记负数，为欠款或者借款")
+        print("活期钱不够了，定期转活期2w，若定期余额不足则记负数，为欠款或者借款")
+    print(zichan.huoqi)
     # 定期跑批
     if zichan.dingqi > 0:
         zichan.dingqi = zichan.dingqi * (1 + lv_dingqi)
@@ -115,13 +122,20 @@ def paopi(zichan, yg):
 '''
 房价，房屋面积，定期存款，活期存款，房贷，其他贷，年收入，年支出
 '''
-str1 = '20资产，买房首付20贷50，起始跑批0存50房贷，20其他贷,年收入54000，消费支出30000      : '
-fenghao_0_50 = Zichan(5426, 129, 0, 3000, 500000, 200000,4500 * 12, 30000,str1)
-str2 = '20资产，不买房，起始跑批20存0房贷，0其他贷,年收入54000，消费支出30000              : '
-fenghao_20_0 = Zichan(0, 0, 200000, 3000, 0, 0, 4500 * 12, 30000,str2)
-str3 = '40存款,买房首付20，贷50贷，起始跑批20存50房贷，20其他贷,年收入54000，消费支出30000  : '
-fenghao_20_50 = Zichan(5426, 129, 180000, 20000, 500000, 200000,4500 * 12, 30000,str3)
-list_ren = [fenghao_0_50,fenghao_20_0,fenghao_20_50]
+str1 = '20资产，买房首付20贷50，起始跑批0存50房贷，20其他贷,年收入54000，消费支出30000,起始资产 0      : '
+fenghao_20_50_20 = Zichan(5426, 129, 0, 3000, 500000, 200000,gz * 12, zc,str1)
+str2 = '20资产，不买房，起始跑批20存0房贷，0其他贷,年收入54000，消费支出30000，起始资产20              : '
+fenghao_20_0_0 = Zichan(0, 0, 200000, 3000, 0, 0, gz * 12, zc,str2)
+str3 = '40存款,买房首付20，贷50贷，起始跑批20存50房贷，20其他贷,年收入54000，消费支出30000，起始资产20  : '
+fenghao_40_50_20 = Zichan(5426, 129, 180000, 20000, 500000, 200000,gz * 12, zc,str3)
+str4 = '20存款,买房首付20，贷50贷，起始跑批0存50房贷，0其他贷,年收入54000，消费支出30000，起始资产20  : '
+fenghao_20_50_0 = Zichan(5426, 129, 180000, 20000, 500000, 0,gz * 12, zc,str4)
+str5 = '0存款,买房首付20，贷50贷，起始跑批0存50房贷，30其他贷,年收入54000，消费支出30000，起始资产-10  : '
+fenghao_0_50_20 = Zichan(5426, 129, 0, 3000, 500000, 300000,gz * 12, zc,str5)
+
+
+list_ren = [fenghao_20_50_20,fenghao_20_0_0,fenghao_40_50_20,fenghao_20_50_0,fenghao_0_50_20]
+#list_ren = [fenghao_20_50_20]
 
 yg_fh = fangdaihuankuan(5426*129-200000, 0.0285 / 12, 240)
 
