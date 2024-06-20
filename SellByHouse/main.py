@@ -84,24 +84,24 @@ def paopi(zichan, yg):
     # 有月供的话，加入支出
     if zichan.daikuan > 0:
         zichan.zhichu = zichan.zhichu + yg * 12
-        print(f'支出增加 月供*12 ：{yg * 12}' )
+        #print(f'支出增加 月供*12 ：{yg * 12}' )
     # 有其他贷款的话，利息加入支出
     if zichan.daikuan_0 > 0:
         zichan.zhichu = zichan.zhichu + zichan.daikuan_0 * lv_daikuan_zgd
-        print(f'支出增加 其他贷款利息 ： {zichan.daikuan_0 * lv_daikuan_zgd}')
+        #print(f'支出增加 其他贷款利息 ： {zichan.daikuan_0 * lv_daikuan_zgd}')
     # 年结余
     jieyu = zichan.shouru - zichan.zhichu
-    print(f'结余为：收入{zichan.shouru} - 支出{zichan.zhichu} :{jieyu}')
+    #print(f'结余为：收入{zichan.shouru} - 支出{zichan.zhichu} :{jieyu}')
     # 活期跑批
     zichan.huoqi = (zichan.huoqi + jieyu) * (1 + lv_huoqi)
     if zichan.huoqi > 40000:
         zichan.dingqi = zichan.dingqi + 30000
         zichan.huoqi = zichan.huoqi - 30000
-        print("活期存款较多，活期转定期3w")
+        #print("活期存款较多，活期转定期3w")
     if zichan.huoqi < 0:
         zichan.dingqi = zichan.dingqi - 20000
         zichan.huoqi = zichan.huoqi + 20000
-        print("活期钱不够了，定期转活期2w，若定期余额不足则记负数，为欠款或者借款")
+        #print("活期钱不够了，定期转活期2w，若定期余额不足则记负数，为欠款或者借款")
     # 定期跑批
     if zichan.dingqi > 0:
         zichan.dingqi = zichan.dingqi * (1 + lv_dingqi)
@@ -121,18 +121,22 @@ str2 = '20资产，不买房，起始跑批20存0房贷，0其他贷,年收入54
 fenghao_20_0 = Zichan(0, 0, 200000, 3000, 0, 0, 4500 * 12, 30000,str2)
 str3 = '40存款,买房首付20，贷50贷，起始跑批20存50房贷，20其他贷,年收入54000，消费支出30000  : '
 fenghao_20_50 = Zichan(5426, 129, 180000, 20000, 500000, 200000,4500 * 12, 30000,str3)
-
+list_ren = [fenghao_0_50,fenghao_20_0,fenghao_20_50]
 
 yg_fh = fangdaihuankuan(5426*129-200000, 0.0285 / 12, 240)
 
 for i in range(20):
     print(f'第{i}年跑批结果：')
+    for r in list_ren:
+        r = paopi(r,yg_fh)
+    ''' 
     #print(f'20资产，买房首付20贷50，起始跑批0存50房贷,20其他贷')
-    fenghao_0_50 = paopi(fenghao_0_50, yg_fh)
+    #fenghao_0_50 = paopi(fenghao_0_50, yg_fh)
     #print(f'20资产，不买房，起始跑批20存0房贷，0其他贷')
-    fenghao_20_0 = paopi(fenghao_20_0, yg_fh)
+    #fenghao_20_0 = paopi(fenghao_20_0, yg_fh)
     #print(f'40资产,买房首付20，贷50贷，起始跑批20存50贷，20其他贷')
-    fenghao_20_50 = paopi(fenghao_20_50, yg_fh)
+    #fenghao_20_50 = paopi(fenghao_20_50, yg_fh)
+    '''
 
 '''
 假设
